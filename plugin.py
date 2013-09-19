@@ -53,11 +53,11 @@ class Validator(sublime_plugin.EventListener):
         if view_id in self.view_cache:
             del self.view_cache[view_id]
 
-    def update_statusbar(self, view):
+    def update_statusbar(self, view, force=False):
         line = self.get_selected_line(view)
         view_id = view.id()
 
-        if line != self.view_line.get(view.id(), None):
+        if force or line != self.view_line.get(view.id(), None):
             self.view_line[view_id] = line
             error = self.view_cache.get(view_id, {}).get(line, None)
             if error:
@@ -82,6 +82,7 @@ class Validator(sublime_plugin.EventListener):
         style_problems = self.get_style_problems(source, filename)
         problems = list(flakes) + list(style_problems)
         self.highlight_problems(view, problems)
+        self.update_statusbar(view, force=True)
 
     def get_flakes(self, source, filename):
         try:
@@ -116,4 +117,4 @@ class Validator(sublime_plugin.EventListener):
         style = (sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE |
                  sublime.DRAW_SQUIGGLY_UNDERLINE)
         view.add_regions('python-lint-problem', regions, 'invalid',
-                         'Packages/SublimePythonLint/images/marker.png', style)
+                         'Packages/PythonChecker/images/marker.png', style)
