@@ -6,7 +6,6 @@ import sublime_plugin
 from . import checker
 
 PACKAGE_NAME = os.path.basename(os.path.dirname(__file__))
-print(PACKAGE_NAME)
 
 
 class Validator(sublime_plugin.EventListener):
