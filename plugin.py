@@ -1,7 +1,12 @@
+import os.path
+
 import sublime
 import sublime_plugin
 
 from . import checker
+
+PACKAGE_NAME = os.path.basename(os.path.dirname(__file__))
+print(PACKAGE_NAME)
 
 
 class Validator(sublime_plugin.EventListener):
@@ -85,4 +90,5 @@ class Validator(sublime_plugin.EventListener):
         style = (sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE |
                  sublime.DRAW_SQUIGGLY_UNDERLINE)
         view.add_regions('python-checker-problem', regions, 'invalid',
-                         'Packages/Python Checker/images/marker.png', style)
+                         'Packages/%s/images/marker.png' % (PACKAGE_NAME,),
+                         style)
