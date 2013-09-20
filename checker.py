@@ -1,5 +1,6 @@
 import ast
 from collections import namedtuple
+import os.path
 import sys
 import tempfile
 
@@ -64,25 +65,9 @@ def get_external(source, filename, executable):
     import subprocess
     with tempfile.NamedTemporaryFile() as tf:
         tf.write(source.encode('utf-8'))
-        output = subprocess.check_output([executable, __file__, tf.name,
-                                          filename])
+        output = subprocess.check_output([executable,
+                                          os.path.dirname(__file__),
+                                          tf.name, filename])
     problems = json.loads(output.decode('utf-8'))
     problems = [Problem(*p) for p in problems]
     return problems
-
-
-def main(filename, path):
-    import json
-    with open(filename, 'rb') as f:
-        source = f.read()
-    if sys.version_info[0] >= 3:
-        source = source.decode('utf-8')
-    problems = get_problems(source, path)
-    json.dump(problems, sys.stdout)
-
-
-if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        main(sys.argv[1], sys.argv[2])
-    else:
-        print('Usage: %s %s <filename> <path>' % (sys.executable, sys.argv[0]))

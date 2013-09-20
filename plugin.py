@@ -5,7 +5,7 @@ import sublime_plugin
 
 from . import checker
 
-PACKAGE_NAME = os.path.basename(os.path.dirname(__file__))
+PACKAGE_NAME = os.path.splitext(os.path.basename(os.path.dirname(__file__)))[0]
 
 
 class Validator(sublime_plugin.EventListener):
