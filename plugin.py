@@ -7,7 +7,6 @@ from . import checker
 class Validator(sublime_plugin.EventListener):
 
     KNOWN_SYNTAXES = {'Packages/Python/Python.tmLanguage'}
-    PEP8_IGNORED = {'E501', 'W191'}
 
     def __init__(self, *args, **kwargs):
         self.view_cache = {}
