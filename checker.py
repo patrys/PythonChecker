@@ -12,8 +12,6 @@ except (SystemError, ValueError):
     from pep8 import pep8
     from pyflakes import checker
 
-PEP8_IGNORED = {'E501', 'W191'}
-
 Problem = namedtuple('Problem', 'level lineno offset message')
 
 
@@ -52,7 +50,9 @@ def get_flakes(source, filename):
 
 
 def get_style_problems(source, filename):
-    guide = pep8.StyleGuide(reporter=Pep8Report, ignore=PEP8_IGNORED)
+    config, _args = pep8.process_options([filename], config_file=True)
+    config = dict(config.__dict__, reporter=Pep8Report)
+    guide = pep8.StyleGuide(**config)
     lines = source.splitlines(True)
     checker = pep8.Checker(filename, lines, guide.options)
     checker.check_all()
@@ -64,24 +64,25 @@ def get_external(source, filename, executable):
     import subprocess
     with tempfile.NamedTemporaryFile() as tf:
         tf.write(source.encode('utf-8'))
-        output = subprocess.check_output([executable, __file__, tf.name])
+        output = subprocess.check_output([executable, __file__, tf.name,
+                                          filename])
     problems = json.loads(output.decode('utf-8'))
     problems = [Problem(*p) for p in problems]
     return problems
 
 
-def main(filename):
+def main(filename, path):
     import json
     with open(filename, 'rb') as f:
         source = f.read()
     if sys.version_info[0] >= 3:
         source = source.decode('utf-8')
-    problems = get_problems(source, filename)
+    problems = get_problems(source, path)
     json.dump(problems, sys.stdout)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        main(sys.argv[1])
+    if len(sys.argv) == 3:
+        main(sys.argv[1], sys.argv[2])
     else:
-        print('Usage: %s %s <filename>' % (sys.executable, sys.argv[0],))
+        print('Usage: %s %s <filename> <path>' % (sys.executable, sys.argv[0]))

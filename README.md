@@ -29,3 +29,15 @@ By default Python Checker will use the version of Python that came with Sublime 
 ```
 
 This is compatible with other plugins including [SublimeJEDI](https://github.com/srusskih/SublimeJEDI).
+
+PEP8 checks
+-----------
+
+Use the standard `pep8` [configuration files](http://pep8.readthedocs.org/en/latest/intro.html#configuration) to control the behaviour including skipping some checks. An example project configration might look like this:
+
+```ini
+# setup.cfg or tox.ini
+[pep8]
+ignore = E501,W191
+max-line-length = 120
+```
