@@ -61,9 +61,9 @@ class Validator(sublime_plugin.EventListener):
             self.view_line[view_id] = line
             error = self.view_cache.get(view_id, {}).get(line, None)
             if error:
-                view.set_status('python-lint-problem', error)
+                view.set_status('python-checker-problem', error)
             else:
-                view.erase_status('python-lint-problem')
+                view.erase_status('python-checker-problem')
 
     def get_selected_line(self, view):
         selection = view.sel()
@@ -105,7 +105,7 @@ class Validator(sublime_plugin.EventListener):
         return checker.report.problems
 
     def highlight_problems(self, view, problems):
-        view.erase_regions('python-lint-problem')
+        view.erase_regions('python-checker-problem')
         view_id = view.id()
         self.view_cache[view_id] = {}
         regions = []
@@ -116,5 +116,5 @@ class Validator(sublime_plugin.EventListener):
             regions.append(region)
         style = (sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE |
                  sublime.DRAW_SQUIGGLY_UNDERLINE)
-        view.add_regions('python-lint-problem', regions, 'invalid',
-                         'Packages/PythonChecker/images/marker.png', style)
+        view.add_regions('python-checker-problem', regions, 'invalid',
+                         'Packages/Python Checker/images/marker.png', style)
