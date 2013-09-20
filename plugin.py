@@ -53,9 +53,10 @@ class Validator(sublime_plugin.EventListener):
 
     def get_selected_line(self, view):
         selection = view.sel()
-        if not selection:
+        try:
+            return view.rowcol(selection[0].end())[0]
+        except Exception:
             return None
-        return view.rowcol(selection[0].end())[0]
 
     def revalidate(self, view):
         if view.settings().get("syntax") not in self.KNOWN_SYNTAXES:
