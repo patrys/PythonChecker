@@ -8,3 +8,8 @@ A maintainable Python code checker for Sublime Text 3
 Once the plugin is installed, it will highlight common problems in your Python code.
 
 Internally it relies on the wonderful `pyflakes` and `pep8` packages.
+
+Installation
+------------
+
+Use [Package Control](https://sublime.wbond.net/).
