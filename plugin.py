@@ -1,24 +1,7 @@
-import ast
-from collections import namedtuple
-import sys
-
 import sublime
 import sublime_plugin
 
-from .pep8 import pep8
-from .pyflakes import checker
-
-Problem = namedtuple('Problem', 'level lineno offset message')
-
-
-class Pep8Report(pep8.BaseReport):
-
-    def __init__(self, *args, **kwargs):
-        self.problems = []
-        super().__init__(*args, **kwargs)
-
-    def error(self, line_number, offset, text, check):
-        self.problems.append(Problem('warn', line_number, offset, text))
+from . import checker
 
 
 class Validator(sublime_plugin.EventListener):
@@ -74,35 +57,21 @@ class Validator(sublime_plugin.EventListener):
     def revalidate(self, view):
         if view.settings().get("syntax") not in self.KNOWN_SYNTAXES:
             return
+        problems = self.get_problems(view)
+        self.highlight_problems(view, problems)
+        self.update_statusbar(view, force=True)
+
+    def get_problems(self, view):
         filename = view.file_name()
         if not filename:
             filename = '<unsaved>'
         source = view.substr(sublime.Region(0, view.size()))
-        flakes = self.get_flakes(source, filename)
-        style_problems = self.get_style_problems(source, filename)
-        problems = list(flakes) + list(style_problems)
-        self.highlight_problems(view, problems)
-        self.update_statusbar(view, force=True)
-
-    def get_flakes(self, source, filename):
-        try:
-            tree = ast.parse(source, filename, "exec")
-        except SyntaxError:
-            value = sys.exc_info()[1]
-            msg = value.args[0]
-            yield Problem('error', value.lineno, value.offset, msg)
-        else:
-            results = checker.Checker(tree, filename)
-            for m in results.messages:
-                yield Problem('warn', m.lineno, m.col,
-                              m.message % m.message_args)
-
-    def get_style_problems(self, source, filename):
-        guide = pep8.StyleGuide(reporter=Pep8Report, ignore=self.PEP8_IGNORED)
-        lines = source.splitlines(True)
-        checker = pep8.Checker(filename, lines, guide.options)
-        checker.check_all()
-        return checker.report.problems
+        settings = view.settings()
+        python_executable = settings.get('python_interpreter_path', None)
+        if python_executable:
+            return checker.get_external(source, filename,
+                                        executable=python_executable)
+        return checker.get_problems(source, filename)
 
     def highlight_problems(self, view, problems):
         view.erase_regions('python-checker-problem')
