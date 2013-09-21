@@ -63,11 +63,15 @@ def get_style_problems(source, filename):
 def get_external(source, filename, executable):
     import json
     import subprocess
-    with tempfile.NamedTemporaryFile() as tf:
-        tf.write(source.encode('utf-8'))
+    tf = tempfile.NamedTemporaryFile(delete=False)
+    tf.write(source.encode('utf-8'))
+    tf.close()
+    try:
         output = subprocess.check_output([executable,
                                           os.path.dirname(__file__),
                                           tf.name, filename])
+    finally:
+        os.unlink(tf.name)
     problems = json.loads(output.decode('utf-8'))
     problems = [Problem(*p) for p in problems]
     return problems
