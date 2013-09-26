@@ -80,13 +80,14 @@ class Validator(sublime_plugin.EventListener):
     def highlight_problems(self, view, problems):
         view.erase_regions('python-checker-problem')
         view_id = view.id()
-        self.view_cache[view_id] = {}
+        view_cache = {}
         regions = []
         for problem in problems:
-            self.view_cache[view_id][problem.lineno - 1] = problem.message
+            view_cache[problem.lineno - 1] = problem.message
             region_start = view.text_point(problem.lineno - 1, problem.offset)
             region = view.word(region_start)
             regions.append(region)
+        self.view_cache[view_id] = view_cache
         style = (sublime.DRAW_NO_FILL | sublime.DRAW_NO_OUTLINE |
                  sublime.DRAW_SQUIGGLY_UNDERLINE)
         view.add_regions('python-checker-problem', regions, 'invalid',
