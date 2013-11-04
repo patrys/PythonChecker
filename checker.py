@@ -26,6 +26,9 @@ class Pep8Report(pep8.BaseReport):
             super(Pep8Report, self).__init__(*args, **kwargs)
 
     def error(self, line_number, offset, text, check):
+        code = text[:4]
+        if self._ignore_code(code):
+            return
         level = 'error' if text.startswith('E') else 'warn'
         self.problems.append(Problem(level, line_number, offset, text))
 
