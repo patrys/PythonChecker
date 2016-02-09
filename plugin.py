@@ -10,7 +10,8 @@ PACKAGE_NAME = os.path.splitext(os.path.basename(os.path.dirname(__file__)))[0]
 
 class Validator(sublime_plugin.EventListener):
 
-    KNOWN_SYNTAXES = {'Packages/Python/Python.tmLanguage'}
+    KNOWN_SYNTAXES = {'Packages/Python/Python.tmLanguage',
+                      'Packages/Python/Python.sublime-syntax'}
 
     def __init__(self, *args, **kwargs):
         self.view_cache = {}
